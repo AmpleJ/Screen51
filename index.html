@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fantasy Stat Web App</title>
+  <title>Alley's DM Screen v0.6.42.9</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
@@ -26,13 +26,11 @@
     }
     #canvas {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(3, 1fr); /* Limit instances to 3 per row */
       gap: 1rem;
       padding: 1rem;
       min-height: calc(100vh - 60px);
       background: linear-gradient(to bottom, #333, #000); /* Dark gray to black vertical gradient */
-      transform: scale(1); /* Reset scaling to 100% */
-      transform-origin: top left; /* Set the origin for scaling */
     }
     .instance {
       border: 3px ridge #5b3e1d;
