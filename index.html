@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fantasy Stat Web App</title>
+  <title>Allley's Quick Reference and Tracking Screen v0.6.51.12.1</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
@@ -15,7 +15,7 @@
       margin: 0;
       padding: 0;
       height: 100%;
-      background: url('https://www.transparenttextures.com/patterns/parchment.png');
+      background: url('https://www.transparenttextures.com/patterns/dark-fantasy.png'); /* Changed background to a dark fantasy texture */
     }
     #controls {
       padding: 1rem;
@@ -36,8 +36,8 @@
       background: #f4f0d9;
       padding: 1rem;
       margin: 1rem;
-      width: 525px; /* Increased by 75% from 300px */
-      min-height: 700px; /* Increased by 75% from 400px */
+      width: 423.36px; /* Increased by 12% from 378px */
+      min-height: 336px; /* Reduced by 20% from 420px */
       position: relative;
       resize: both;
       overflow: auto;
@@ -48,6 +48,9 @@
       margin-bottom: 0.5rem;
       text-align: center;
     }
+    .instance textarea {
+      text-align: left; /* Align text to the left for all textareas */
+    }
     .instance table {
       width: 100%;
       border-collapse: collapse;
@@ -57,6 +60,21 @@
       border: 1px solid #444;
       text-align: center;
       padding: 0.25rem;
+    }
+    .close-btn {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+      background: #ff5c5c;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      line-height: 20px;
+      text-align: center;
     }
     .hidden { display: none; }
   </style>
@@ -78,6 +96,7 @@
       container.setAttribute('data-theme-index', '0');
 
       container.innerHTML = `
+        <button class="close-btn" onclick="removeThisInstance(this)">X</button>
         <input type="text" placeholder="Name:" style="font-size: 1.2rem;" />
 
         <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -89,7 +108,7 @@
 
         <table>
           <tr>${["STR", "DEX", "CON", "INT", "WIS", "CHA"].map(stat => `<th>${stat}</th>`).join('')}</tr>
-          <tr>${Array(6).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" title="" readonly /></td>`).join('')}</tr>
+          <tr ondrop="drop(event)" ondragover="allowDrop(event)">${Array(6).fill('').map((_, index) => `<td><input id="cell-${instanceCount}-${index}" type="number" min="0" max="99" value="0" title="" readonly draggable="true" ondragstart="drag(event)" /></td>`).join('')}</tr>
         </table>
 
         <table>
@@ -107,10 +126,15 @@
 
         <button onclick="generateStats(this)">Generate</button>
         <button onclick="resetInstance(this)">Reset</button>
+        <br><br> <!-- Add line of space above and between the buttons and the Actions textarea -->
 
+        <label>Actions:</label>
         <textarea placeholder="Actions:"></textarea>
+        <label>Spells:</label>
         <textarea placeholder="Spells:"></textarea>
+        <label>Inventory:</label>
         <textarea placeholder="Inventory:"></textarea>
+        <label>Notes:</label>
         <textarea placeholder="Notes:"></textarea>
       `;
 
@@ -124,6 +148,12 @@
         canvas.removeChild(canvas.lastChild);
         instanceCount--;
       }
+    }
+
+    function removeThisInstance(button) {
+      const instance = button.closest('.instance');
+      instance.remove();
+      instanceCount--;
     }
 
     function resetInstance(button) {
@@ -171,8 +201,28 @@
       updateTheme(select);
     }
 
+    function allowDrop(event) {
+      event.preventDefault();
+    }
+
+    function drag(event) {
+      event.dataTransfer.setData("text", event.target.id);
+    }
+
+    function drop(event) {
+      event.preventDefault();
+      const data = event.dataTransfer.getData("text");
+      const draggedElement = document.getElementById(data);
+      const targetElement = event.target;
+      if (targetElement.tagName === "INPUT" && targetElement.type === "number") {
+        const tempValue = targetElement.value;
+        targetElement.value = draggedElement.value;
+        draggedElement.value = tempValue;
+      }
+    }
+
     window.onload = () => {
-      document.querySelector('#controls button').click();
+      addInstance();  // Spawn the first instance when the page loads
     }
   </script>
 </body>
