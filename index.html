@@ -8,7 +8,7 @@
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
     * {
-      font-family: 'MedievalSharp', Arial, sans-serif;
+      font-family: Arial, sans-serif;
       box-sizing: border-box;
     }
     html, body {
@@ -25,10 +25,9 @@
       gap: 1rem;
     }
     #canvas {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      align-items: start;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
       padding: 1rem;
       min-height: calc(100vh - 60px);
     }
@@ -37,8 +36,8 @@
       background: #f4f0d9;
       padding: 1rem;
       margin: 1rem;
-      width: 300px;
-      min-height: 400px;
+      width: 525px; /* Increased by 75% from 300px */
+      min-height: 700px; /* Increased by 75% from 400px */
       position: relative;
       resize: both;
       overflow: auto;
@@ -71,7 +70,7 @@
 
   <script>
     let instanceCount = 0;
-    const themes = ["white", "gray", "black", "brown", "red", "orange", "yellow", "green", "blue", "indigo", "violet", "pink"];
+    const themes = ["Default", "white", "gray", "black", "brown", "red", "orange", "yellow", "green", "blue", "indigo", "violet", "pink"];
 
     function addInstance() {
       const container = document.createElement('div');
@@ -90,7 +89,7 @@
 
         <table>
           <tr>${["STR", "DEX", "CON", "INT", "WIS", "CHA"].map(stat => `<th>${stat}</th>`).join('')}</tr>
-          <tr>${Array(6).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" /></td>`).join('')}</tr>
+          <tr>${Array(6).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" title="" readonly /></td>`).join('')}</tr>
         </table>
 
         <table>
@@ -129,17 +128,19 @@
 
     function resetInstance(button) {
       const instance = button.closest('.instance');
-      instance.querySelectorAll('input, textarea').forEach(el => {
-        if (el.type === 'number') el.value = 0;
-        else el.value = '';
-      });
+      instance.querySelectorAll('input[type="number"]').forEach(el => el.value = 0);
+      instance.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+      instance.querySelectorAll('select').forEach(select => select.selectedIndex = 0);
+      instance.style.backgroundColor = "";
+      instance.style.color = "";
     }
 
     function generateStats(button) {
       const instance = button.closest('.instance');
-      const inputs = instance.querySelectorAll('table:nth-of-type(1) tr:nth-of-type(2) input');
+      const firstRowInputs = instance.querySelectorAll('table:nth-of-type(1) tr:nth-of-type(2) input');
+      const spellSlotInputs = instance.querySelectorAll('details table tr:nth-of-type(2) input');
 
-      inputs.forEach(input => {
+      firstRowInputs.forEach(input => {
         const rolls = Array.from({length: 4}, () => Math.floor(Math.random() * 6 + 1));
         const sorted = [...rolls].sort((a, b) => b - a);
         const dropped = sorted[3];
@@ -147,12 +148,17 @@
         input.value = sum;
         input.title = `${sorted.slice(0, 3).join(',')},(${dropped})`;
       });
+
+      spellSlotInputs.forEach(input => {
+        input.value = 0;
+      });
     }
 
     function updateTheme(select) {
       const instance = select.closest('.instance');
       const theme = select.value;
-      instance.style.backgroundColor = theme;
+      instance.style.backgroundColor = theme === "Default" ? "" : theme;
+      instance.style.color = (["black", "brown", "blue", "indigo"].includes(theme)) ? "#fff" : "#000";
     }
 
     function cycleTheme(button) {
@@ -166,9 +172,8 @@
     }
 
     window.onload = () => {
-      addInstance();
+      document.querySelector('#controls button').click();
     }
   </script>
 </body>
 </html>
-
