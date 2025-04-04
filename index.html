@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Allley's Quick Reference and Tracking Screen v0.6.51.12.1</title>
+  <title>Fantasy Stat Web App</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
@@ -30,14 +30,17 @@
       gap: 1rem;
       padding: 1rem;
       min-height: calc(100vh - 60px);
+      background: linear-gradient(to bottom, #333, #000); /* Dark gray to black vertical gradient */
+      transform: scale(1); /* Reset scaling to 100% */
+      transform-origin: top left; /* Set the origin for scaling */
     }
     .instance {
       border: 3px ridge #5b3e1d;
       background: #f4f0d9;
       padding: 1rem;
       margin: 1rem;
-      width: 423.36px; /* Increased by 12% from 378px */
-      min-height: 336px; /* Reduced by 20% from 420px */
+      width: 423.36px; /* Reset width to original size */
+      min-height: 336px; /* Reset min-height to original size */
       position: relative;
       resize: both;
       overflow: auto;
