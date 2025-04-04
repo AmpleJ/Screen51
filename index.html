@@ -1,1 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fantasy Stat Web App</title>
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+    * {
+      font-family: 'MedievalSharp', Arial, sans-serif;
+      box-sizing: border-box;
+    }
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      background: url('https://www.transparenttextures.com/patterns/parchment.png');
+    }
+    #controls {
+      padding: 1rem;
+      background: #222;
+      color: #fff;
+      display: flex;
+      gap: 1rem;
+    }
+    #canvas {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: start;
+      padding: 1rem;
+      min-height: calc(100vh - 60px);
+    }
+    .instance {
+      border: 3px ridge #5b3e1d;
+      background: #f4f0d9;
+      padding: 1rem;
+      margin: 1rem;
+      width: 300px;
+      min-height: 400px;
+      position: relative;
+      resize: both;
+      overflow: auto;
+    }
+    .instance input[type="text"], .instance select, .instance input[type="number"], .instance textarea {
+      width: 100%;
+      padding: 0.25rem;
+      margin-bottom: 0.5rem;
+      text-align: center;
+    }
+    .instance table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1rem;
+    }
+    .instance th, .instance td {
+      border: 1px solid #444;
+      text-align: center;
+      padding: 0.25rem;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <button onclick="addInstance()">Add</button>
+    <button onclick="removeInstance()">Subtract</button>
+  </div>
+  <div id="canvas"></div>
+
+  <script>
+    let instanceCount = 0;
+    const themes = ["white", "gray", "black", "brown", "red", "orange", "yellow", "green", "blue", "indigo", "violet", "pink"];
+
+    function addInstance() {
+      const container = document.createElement('div');
+      container.classList.add('instance');
+      container.setAttribute('data-theme-index', '0');
+
+      container.innerHTML = `
+        <input type="text" placeholder="Name:" style="font-size: 1.2rem;" />
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <select onchange="updateTheme(this)">
+            ${themes.map(t => `<option value="${t}">${t}</option>`).join('')}
+          </select>
+          <button onclick="cycleTheme(this)">⟳</button>
+        </div>
+
+        <table>
+          <tr>${["STR", "DEX", "CON", "INT", "WIS", "CHA"].map(stat => `<th>${stat}</th>`).join('')}</tr>
+          <tr>${Array(6).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" /></td>`).join('')}</tr>
+        </table>
+
+        <table>
+          <tr>${["HP", "AC", "DC", "PP", "Ammo", "Charges"].map(stat => `<th>${stat}</th>`).join('')}</tr>
+          <tr>${Array(6).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" /></td>`).join('')}</tr>
+        </table>
+
+        <details>
+          <summary>Spell Slots</summary>
+          <table>
+            <tr>${Array.from({length: 9}, (_, i) => `<th>${i+1}</th>`).join('')}</tr>
+            <tr>${Array(9).fill('').map(() => `<td><input type="number" min="0" max="99" value="0" /></td>`).join('')}</tr>
+          </table>
+        </details>
+
+        <button onclick="generateStats(this)">Generate</button>
+        <button onclick="resetInstance(this)">Reset</button>
+
+        <textarea placeholder="Actions:"></textarea>
+        <textarea placeholder="Spells:"></textarea>
+        <textarea placeholder="Inventory:"></textarea>
+        <textarea placeholder="Notes:"></textarea>
+      `;
+
+      document.getElementById('canvas').appendChild(container);
+      instanceCount++;
+    }
+
+    function removeInstance() {
+      const canvas = document.getElementById('canvas');
+      if (canvas.lastChild) {
+        canvas.removeChild(canvas.lastChild);
+        instanceCount--;
+      }
+    }
+
+    function resetInstance(button) {
+      const instance = button.closest('.instance');
+      instance.querySelectorAll('input, textarea').forEach(el => {
+        if (el.type === 'number') el.value = 0;
+        else el.value = '';
+      });
+    }
+
+    function generateStats(button) {
+      const instance = button.closest('.instance');
+      const inputs = instance.querySelectorAll('table:nth-of-type(1) tr:nth-of-type(2) input');
+
+      inputs.forEach(input => {
+        const rolls = Array.from({length: 4}, () => Math.floor(Math.random() * 6 + 1));
+        const sorted = [...rolls].sort((a, b) => b - a);
+        const dropped = sorted[3];
+        const sum = sorted.slice(0, 3).reduce((a, b) => a + b, 0);
+        input.value = sum;
+        input.title = `${sorted.slice(0, 3).join(',')},(${dropped})`;
+      });
+    }
+
+    function updateTheme(select) {
+      const instance = select.closest('.instance');
+      const theme = select.value;
+      instance.style.backgroundColor = theme;
+    }
+
+    function cycleTheme(button) {
+      const instance = button.closest('.instance');
+      let index = parseInt(instance.getAttribute('data-theme-index'));
+      index = (index + 1) % themes.length;
+      instance.setAttribute('data-theme-index', index);
+      const select = instance.querySelector('select');
+      select.selectedIndex = index;
+      updateTheme(select);
+    }
+
+    window.onload = () => {
+      addInstance();
+    }
+  </script>
+</body>
+</html>
 
