@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Alley's DM Screen v.0.6.58.13</title>
+  <title>Alley's DM Screen v0.6.72.15</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible&display=swap');
     * {
-      font-family: Arial, sans-serif;
+      font-family: 'Atkinson Hyperlegible', Arial, sans-serif;
       box-sizing: border-box;
     }
     html, body {
@@ -48,6 +48,8 @@
       padding: 0.25rem;
       margin-bottom: 0.5rem;
       text-align: center;
+      background: #fff;
+      color: #000;
     }
     .instance textarea {
       text-align: left; /* Align text to the left for all textareas */
@@ -61,12 +63,15 @@
       border: 1px solid #444;
       text-align: center;
       padding: 0.25rem;
+      background: #fff;
+      color: #000;
     }
     .instance th input[type="text"] {
       width: 100%;
       text-align: center;
       border: none;
       background: none;
+      color: inherit;
     }
     .close-btn {
       position: absolute;
@@ -209,8 +214,48 @@
     function updateTheme(select) {
       const instance = select.closest('.instance');
       const theme = select.value;
-      instance.style.backgroundColor = theme === "Default" ? "" : theme;
-      instance.style.color = (["black", "brown", "blue", "indigo"].includes(theme)) ? "#fff" : "#000";
+
+      // Reset to default styles
+      instance.style.backgroundColor = "#f4f0d9";
+      instance.style.color = "#000";
+      instance.querySelectorAll('input[type="text"], .instance select, input[type="number"], textarea').forEach(el => {
+        el.style.backgroundColor = "#fff";
+        el.style.color = "#000";
+      });
+      instance.querySelectorAll('th, td').forEach(el => {
+        el.style.backgroundColor = "#fff";
+        el.style.color = "#000";
+      });
+
+      // Apply theme-specific styles
+      switch (theme) {
+        case "Default":
+          break;
+        case "black":
+          instance.style.backgroundColor = "#000";
+          instance.style.color = "#fff";
+          instance.querySelectorAll('input[type="text"], .instance select, input[type="number"], textarea').forEach(el => {
+            el.style.backgroundColor = "#333";
+            el.style.color = "#fff";
+          });
+          instance.querySelectorAll('th, td').forEach(el => {
+            el.style.backgroundColor = "#333";
+            el.style.color = "#fff";
+          });
+          break;
+        case "brown":
+          instance.style.backgroundColor = "#8B4513";
+          instance.style.color = "#fff";
+          break;
+        case "blue":
+        case "indigo":
+          instance.style.backgroundColor = theme;
+          instance.style.color = "#fff";
+          break;
+        default:
+          instance.style.backgroundColor = theme;
+          instance.style.color = "#000";
+      }
     }
 
     function cycleTheme(button) {
